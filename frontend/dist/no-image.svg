@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="500" viewBox="0 0 800 500" role="img" aria-label="No image available">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#101a32" />
+      <stop offset="100%" stop-color="#1d2f59" />
+    </linearGradient>
+  </defs>
+  <rect width="800" height="500" fill="url(#bg)" />
+  <g fill="none" stroke="#6b86c2" stroke-width="14" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="170" y="110" width="460" height="280" rx="20" />
+    <circle cx="305" cy="210" r="36" />
+    <path d="M230 335l110-96 66 57 83-72 81 111" />
+  </g>
+  <text x="400" y="445" text-anchor="middle" fill="#c9d7f6" font-family="Segoe UI, Tahoma, sans-serif" font-size="34" font-weight="600">
+    Image unavailable
+  </text>
+</svg>

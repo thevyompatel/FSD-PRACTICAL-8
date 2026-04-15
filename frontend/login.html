@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - TechStore</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <h1>TechStore</h1>
+            </div>
+            <div class="nav-toggle" id="navToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="index.html#products">Products</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#contact">Contact</a></li>
+                <li><a href="login.html" class="login-btn active">Login</a></li>
+            </ul>
+            <div class="cart-icon" id="cartIcon">
+                <span>CART</span>
+                <span class="cart-count" id="cartCount">0</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Cart Modal -->
+    <div class="cart-modal" id="cartModal">
+        <div class="cart-modal-content">
+            <div class="cart-header">
+                <h2>Shopping Cart</h2>
+                <button class="close-cart" id="closeCart">&times;</button>
+            </div>
+            <div class="cart-items" id="cartItems">
+                <p class="empty-cart">Your cart is empty</p>
+            </div>
+            <div class="cart-footer">
+                <div class="cart-total">
+                    <span>Total:</span>
+                    <span class="total-amount">₹<span id="cartTotal">0.00</span></span>
+                </div>
+                <button class="clear-cart-btn" id="clearCart">Clear Cart</button>
+                <a href="index.html#products" class="checkout-btn" style="text-decoration: none; text-align: center; display: block; line-height: 1.5;">Continue Shopping</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Section -->
+    <section class="login-section">
+        <div class="login-container">
+            <div class="login-box">
+                <h2>Welcome Back</h2>
+                <p class="login-subtitle">Login to your account</p>
+                
+                <form id="loginForm" class="login-form">
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input 
+                            type="email" 
+                            id="email" 
+                            name="email" 
+                            placeholder="Enter your email"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input 
+                            type="password" 
+                            id="password" 
+                            name="password" 
+                            placeholder="Enter your password"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-options">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="remember">
+                            <span>Remember me</span>
+                        </label>
+                        <a href="#" class="forgot-password">Forgot Password?</a>
+                    </div>
+
+                    <button type="submit" class="login-submit-btn">Login</button>
+
+                    <div class="divider">
+                        <span>OR</span>
+                    </div>
+
+                    <button type="button" class="social-login google">
+                        <span></span> Continue with Google
+                    </button>
+                    <button type="button" class="social-login facebook">
+                        <span></span> Continue with Facebook
+                    </button>
+
+                    <p class="signup-link">
+                        Don't have an account? <a href="#" id="signupLink">Sign up</a>
+                    </p>
+                </form>
+            </div>
+
+            <div class="login-image">
+                <div class="image-content">
+                    <h2>Shop the Latest Electronics</h2>
+                    <p>Join thousands of satisfied customers</p>
+                    <ul class="benefits-list">
+                        <li>✓ Exclusive deals and discounts</li>
+                        <li>✓ Fast and secure checkout</li>
+                        <li>✓ Order tracking and history</li>
+                        <li>✓ Priority customer support</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script src="script.js"></script>
+</body>
+</html>
