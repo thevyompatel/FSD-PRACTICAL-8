@@ -278,23 +278,8 @@ a {
 .summary-line {
   display: flex;
   justify-content: space-between;
-  align-items: center;
   gap: 0.8rem;
   margin: 0.5rem 0;
-}
-
-.summary-product {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.summary-thumb {
-  width: 38px;
-  height: 38px;
-  object-fit: cover;
-  border-radius: 0.35rem;
-  border: 1px solid var(--border);
 }
 
 .summary-line.total {

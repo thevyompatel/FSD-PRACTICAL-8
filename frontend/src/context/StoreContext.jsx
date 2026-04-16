@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { cartAPI, orderAPI, paymentAPI, productAPI, userAPI } from '../services/api';
+import { cartAPI, orderAPI, productAPI, userAPI } from '../services/api';
 
 const StoreContext = createContext(null);
 
@@ -193,17 +193,9 @@ export function StoreProvider({ children }) {
 
     try {
       setError('');
-      const paymentResponse = await paymentAPI.process(payload.total);
-      if (paymentResponse.data?.status !== 'success') {
-        throw new Error('Payment failed');
-      }
-
       const response = await orderAPI.createOrder(payload);
       await loadCart(user.id);
-      return {
-        ...response.data,
-        payment: paymentResponse.data
-      };
+      return response.data;
     } catch (err) {
       const message = err.response?.data?.message || 'Unable to place order';
       setError(message);

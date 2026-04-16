@@ -1,0 +1,201 @@
+{
+  "info": {
+    "name": "MERN Practical - Auth & Testing",
+    "description": "Postman collection for register, login, protected product upload, product listing, and mock payment.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Register",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const stamp = Date.now();",
+              "pm.environment.set('testEmail', `postman${stamp}@gmail.com`);",
+              "pm.environment.set('testPassword', '123456');",
+              "pm.environment.set('testName', 'Postman User');"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"{{testEmail}}\",\n  \"password\": \"{{testPassword}}\",\n  \"name\": \"{{testName}}\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/register",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "register"
+          ]
+        }
+      }
+    },
+    {
+      "name": "2. Login",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"{{testEmail}}\",\n  \"password\": \"{{testPassword}}\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/login",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "login"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Login status is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('Token is present', function () {",
+              "    const body = pm.response.json();",
+              "    pm.expect(body.token).to.be.a('string').and.not.empty;",
+              "    pm.environment.set('token', body.token);",
+              "    pm.collectionVariables.set('token', body.token);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Add Product (Protected + Image)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "name",
+              "value": "Wireless Mouse",
+              "type": "text"
+            },
+            {
+              "key": "price",
+              "value": "999",
+              "type": "text"
+            },
+            {
+              "key": "category",
+              "value": "Accessories",
+              "type": "text"
+            },
+            {
+              "key": "stock",
+              "value": "5",
+              "type": "text"
+            },
+            {
+              "key": "image",
+              "type": "file",
+              "src": "c:/Users/thevy/Desktop/VS CODE/3rd YEAR/SEM 6/FSD/8/backend/sample-upload.svg"
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/products",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "products"
+          ]
+        }
+      }
+    },
+    {
+      "name": "4. Get Products",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/api/products",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "products"
+          ]
+        }
+      }
+    },
+    {
+      "name": "5. Mock Payment",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"amount\": 1200\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/payment",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "payment"
+          ]
+        }
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000"
+    },
+    {
+      "key": "token",
+      "value": ""
+    }
+  ]
+}

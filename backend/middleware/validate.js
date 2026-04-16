@@ -1,25 +1,15 @@
 // Validation middleware for requests
 const mongoose = require('mongoose');
 
-const toNumber = (value) => {
-    if (value === undefined || value === null || value === '') {
-        return NaN;
-    }
-
-    return typeof value === 'number' ? value : Number(value);
-};
-
 const validateProduct = (req, res, next) => {
     const { name, price, category, stock } = req.body;
     const errors = [];
-    const parsedPrice = toNumber(price);
-    const parsedStock = stock === undefined ? undefined : toNumber(stock);
 
     if (!name || typeof name !== 'string' || name.trim().length === 0) {
         errors.push('Product name is required and must be a non-empty string');
     }
 
-    if (!Number.isFinite(parsedPrice) || parsedPrice <= 0) {
+    if (!price || typeof price !== 'number' || price <= 0) {
         errors.push('Price is required and must be a positive number');
     }
 
@@ -27,76 +17,8 @@ const validateProduct = (req, res, next) => {
         errors.push('Category is required and must be a non-empty string');
     }
 
-    if (stock !== undefined && (!Number.isFinite(parsedStock) || parsedStock < 0)) {
+    if (stock !== undefined && (typeof stock !== 'number' || stock < 0)) {
         errors.push('Stock must be a non-negative number');
-    }
-
-    if (req.body.badge !== undefined && typeof req.body.badge !== 'string') {
-        errors.push('Badge must be a string when provided');
-    }
-
-    if (errors.length > 0) {
-        return res.status(400).json({
-            success: false,
-            message: 'Validation failed',
-            errors
-        });
-    }
-
-    next();
-};
-
-const validateProductUpdate = (req, res, next) => {
-    const { name, price, category, stock, badge, image } = req.body;
-    const errors = [];
-    let hasUpdateField = false;
-
-    if (name !== undefined) {
-        hasUpdateField = true;
-        if (typeof name !== 'string' || name.trim().length === 0) {
-            errors.push('Product name must be a non-empty string');
-        }
-    }
-
-    if (price !== undefined) {
-        hasUpdateField = true;
-        const parsedPrice = toNumber(price);
-        if (!Number.isFinite(parsedPrice) || parsedPrice <= 0) {
-            errors.push('Price must be a positive number');
-        }
-    }
-
-    if (category !== undefined) {
-        hasUpdateField = true;
-        if (typeof category !== 'string' || category.trim().length === 0) {
-            errors.push('Category must be a non-empty string');
-        }
-    }
-
-    if (stock !== undefined) {
-        hasUpdateField = true;
-        const parsedStock = toNumber(stock);
-        if (!Number.isFinite(parsedStock) || parsedStock < 0) {
-            errors.push('Stock must be a non-negative number');
-        }
-    }
-
-    if (badge !== undefined) {
-        hasUpdateField = true;
-        if (typeof badge !== 'string') {
-            errors.push('Badge must be a string when provided');
-        }
-    }
-
-    if (image !== undefined) {
-        hasUpdateField = true;
-        if (typeof image !== 'string') {
-            errors.push('Image must be a string when provided');
-        }
-    }
-
-    if (!hasUpdateField) {
-        errors.push('At least one product field is required for update');
     }
 
     if (errors.length > 0) {
@@ -193,7 +115,6 @@ const validateCartItem = (req, res, next) => {
 const validateOrder = (req, res, next) => {
     const { userId, items, shippingInfo, paymentMethod, total } = req.body;
     const errors = [];
-    const parsedTotal = toNumber(total);
 
     if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
         errors.push('User ID is required and must be a valid ObjectId');
@@ -206,8 +127,7 @@ const validateOrder = (req, res, next) => {
             if (!item.productId || !mongoose.Types.ObjectId.isValid(item.productId)) {
                 errors.push(`Item ${index}: Product ID is required and must be a valid ObjectId`);
             }
-            const parsedQuantity = toNumber(item.quantity);
-            if (!Number.isFinite(parsedQuantity) || parsedQuantity <= 0) {
+            if (!item.quantity || typeof item.quantity !== 'number' || item.quantity <= 0) {
                 errors.push(`Item ${index}: Quantity is required and must be a positive number`);
             }
         });
@@ -243,7 +163,7 @@ const validateOrder = (req, res, next) => {
         errors.push('Payment method must be one of: card, paypal, cod');
     }
 
-    if (!Number.isFinite(parsedTotal) || parsedTotal <= 0) {
+    if (!total || typeof total !== 'number' || total <= 0) {
         errors.push('Total is required and must be a positive number');
     }
 
@@ -271,26 +191,11 @@ const validateId = (paramName = 'id') => {
     };
 };
 
-const validatePayment = (req, res, next) => {
-    const amount = toNumber(req.body.amount);
-
-    if (!Number.isFinite(amount) || amount <= 0) {
-        return res.status(400).json({
-            success: false,
-            message: 'Amount is required and must be a positive number'
-        });
-    }
-
-    next();
-};
-
 module.exports = {
     validateProduct,
-    validateProductUpdate,
     validateUser,
     validateLogin,
     validateCartItem,
     validateOrder,
-    validateId,
-    validatePayment
+    validateId
 };

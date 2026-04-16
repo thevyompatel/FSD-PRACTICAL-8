@@ -3,8 +3,6 @@ import { Link, useParams } from 'react-router-dom';
 import { productAPI } from '../services/api';
 import { useStore } from '../context/StoreContext';
 
-const FALLBACK_IMAGE = '/no-image.svg';
-
 function ProductDetail() {
   const { id } = useParams();
   const { addToCart } = useStore();
@@ -46,13 +44,9 @@ function ProductDetail() {
   return (
     <section className="detail-layout">
       <img
-        src={product.image || FALLBACK_IMAGE}
+        src={product.image || 'https://via.placeholder.com/600x380?text=No+Image'}
         alt={product.name}
         className="detail-image"
-        onError={(event) => {
-          if (event.currentTarget.src.endsWith(FALLBACK_IMAGE)) return;
-          event.currentTarget.src = FALLBACK_IMAGE;
-        }}
       />
       <div className="detail-content">
         <h1>{product.name}</h1>

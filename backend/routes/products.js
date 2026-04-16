@@ -1,30 +1,20 @@
 const express = require('express');
 const router = express.Router();
-const Product = require('../models/Product');
-const multer = require('multer');
 const path = require('path');
+const multer = require('multer');
+const Product = require('../models/Product');
 const auth = require('../middleware/authMiddleware');
-const { validateProduct, validateProductUpdate, validateId } = require('../middleware/validate');
+const { validateId } = require('../middleware/validate');
 const { asyncHandler, AppError } = require('../middleware/errorHandler');
 
 const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, path.join(__dirname, '..', 'uploads'));
-    },
+    destination: path.join(__dirname, '../uploads'),
     filename: (req, file, cb) => {
-        cb(null, `${Date.now()}-${file.originalname}`);
+        cb(null, `${Date.now()}-${file.originalname.replace(/\s+/g, '-')}`);
     }
 });
 
 const upload = multer({ storage });
-
-const buildImagePath = (file) => {
-    if (!file) {
-        return '';
-    }
-
-    return `/uploads/${file.filename}`;
-};
 
 // GET /api/products - Get all products
 router.get('/', asyncHandler(async (req, res) => {
@@ -57,19 +47,6 @@ router.get('/', asyncHandler(async (req, res) => {
     });
 }));
 
-// GET /api/products/category/:category - Get products by category
-router.get('/category/:category', asyncHandler(async (req, res) => {
-    const products = await Product.find({
-        category: { $regex: `^${req.params.category}$`, $options: 'i' }
-    });
-
-    res.json({
-        success: true,
-        count: products.length,
-        data: products
-    });
-}));
-
 // GET /api/products/:id - Get single product
 router.get('/:id', validateId('id'), asyncHandler(async (req, res) => {
     const product = await Product.findById(req.params.id);
@@ -85,15 +62,27 @@ router.get('/:id', validateId('id'), asyncHandler(async (req, res) => {
 }));
 
 // POST /api/products - Add new product
-router.post('/', auth, upload.single('image'), validateProduct, asyncHandler(async (req, res) => {
-    const productData = {
-        ...req.body,
-        price: Number(req.body.price),
-        stock: req.body.stock !== undefined ? Number(req.body.stock) : undefined,
-        image: buildImagePath(req.file) || req.body.image || ''
-    };
+router.post('/', auth, upload.single('image'), asyncHandler(async (req, res) => {
+    const name = req.body.name;
+    const price = Number(req.body.price);
 
-    const newProduct = await Product.create(productData);
+    if (!name || typeof name !== 'string' || name.trim().length === 0) {
+        throw new AppError('Product name is required', 400);
+    }
+
+    if (!Number.isFinite(price) || price <= 0) {
+        throw new AppError('Price must be a positive number', 400);
+    }
+
+    const newProduct = await Product.create({
+        name: name.trim(),
+        price,
+        category: req.body.category || 'general',
+        description: req.body.description || '',
+        stock: Number(req.body.stock || 0),
+        badge: req.body.badge || null,
+        image: req.file ? `/uploads/${req.file.filename}` : ''
+    });
 
     res.status(201).json({
         success: true,
@@ -103,22 +92,10 @@ router.post('/', auth, upload.single('image'), validateProduct, asyncHandler(asy
 }));
 
 // PUT /api/products/:id - Update product
-router.put('/:id', auth, upload.single('image'), validateId('id'), validateProductUpdate, asyncHandler(async (req, res) => {
-    const updates = {
-        ...req.body,
-        price: req.body.price !== undefined ? Number(req.body.price) : undefined,
-        stock: req.body.stock !== undefined ? Number(req.body.stock) : undefined
-    };
-
-    if (req.file) {
-        updates.image = buildImagePath(req.file);
-    }
-
-    Object.keys(updates).forEach((key) => updates[key] === undefined && delete updates[key]);
-
+router.put('/:id', validateId('id'), asyncHandler(async (req, res) => {
     const updatedProduct = await Product.findByIdAndUpdate(
         req.params.id,
-        updates,
+        req.body,
         { new: true, runValidators: true }
     );
 
@@ -134,7 +111,7 @@ router.put('/:id', auth, upload.single('image'), validateId('id'), validateProdu
 }));
 
 // DELETE /api/products/:id - Delete product
-router.delete('/:id', auth, validateId('id'), asyncHandler(async (req, res) => {
+router.delete('/:id', validateId('id'), asyncHandler(async (req, res) => {
     const deleted = await Product.findByIdAndDelete(req.params.id);
 
     if (deleted === null) {
@@ -144,6 +121,19 @@ router.delete('/:id', auth, validateId('id'), asyncHandler(async (req, res) => {
     res.json({
         success: true,
         message: 'Product deleted successfully'
+    });
+}));
+
+// GET /api/products/category/:category - Get products by category
+router.get('/category/:category', asyncHandler(async (req, res) => {
+    const products = await Product.find({
+        category: { $regex: `^${req.params.category}$`, $options: 'i' }
+    });
+
+    res.json({
+        success: true,
+        count: products.length,
+        data: products
     });
 }));
 

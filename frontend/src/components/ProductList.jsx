@@ -1,8 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useStore } from '../context/StoreContext';
 
-const FALLBACK_IMAGE = '/no-image.svg';
-
 function ProductList() {
   const { products, loading, error, addToCart } = useStore();
 
@@ -24,13 +22,9 @@ function ProductList() {
           {products.map((product) => (
             <article key={product._id} className="card">
               <img
-                src={product.image || FALLBACK_IMAGE}
+                src={product.image || 'https://via.placeholder.com/420x260?text=No+Image'}
                 alt={product.name}
                 className="thumb"
-                onError={(event) => {
-                  if (event.currentTarget.src.endsWith(FALLBACK_IMAGE)) return;
-                  event.currentTarget.src = FALLBACK_IMAGE;
-                }}
               />
               <div className="card-body">
                 <h2>{product.name}</h2>

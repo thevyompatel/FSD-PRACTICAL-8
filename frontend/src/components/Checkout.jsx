@@ -2,8 +2,6 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useStore } from '../context/StoreContext';
 
-const FALLBACK_IMAGE = '/no-image.svg';
-
 const initialForm = {
   fullName: '',
   phone: '',
@@ -46,9 +44,8 @@ function Checkout() {
     setError('');
 
     try {
-      const response = await placeOrder(form);
-      const paymentStatus = response.payment?.status || 'success';
-      setMessage(`Payment ${paymentStatus}. Order placed successfully.`);
+      await placeOrder(form);
+      setMessage('Order placed successfully.');
       setForm(initialForm);
       setTimeout(() => navigate('/'), 1200);
     } catch (err) {
@@ -115,18 +112,7 @@ function Checkout() {
         <h2>Order Summary</h2>
         {cart.map((item) => (
           <div key={item.productId} className="summary-line">
-            <div className="summary-product">
-              <img
-                src={item.image || FALLBACK_IMAGE}
-                alt={item.name}
-                className="summary-thumb"
-                onError={(event) => {
-                  if (event.currentTarget.src.endsWith(FALLBACK_IMAGE)) return;
-                  event.currentTarget.src = FALLBACK_IMAGE;
-                }}
-              />
-              <span>{item.name} x {item.quantity}</span>
-            </div>
+            <span>{item.name} x {item.quantity}</span>
             <strong>Rs {item.lineTotal.toFixed(2)}</strong>
           </div>
         ))}

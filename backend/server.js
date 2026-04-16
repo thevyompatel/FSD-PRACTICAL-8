@@ -1,30 +1,35 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-require('dotenv').config();
 const connectDB = require('./config/db');
 
 // Import routes
-const authRouter = require('./routes/auth');
+const authRouter = require('./routes/authRoutes');
 const productsRouter = require('./routes/products');
 const usersRouter = require('./routes/users');
 const cartRouter = require('./routes/cart');
 const ordersRouter = require('./routes/orders');
 
 // Import middleware
-const { errorHandler, notFound } = require('./middleware/errorHandler');
+const { errorHandler } = require('./middleware/errorHandler');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// Practical root route
+app.get('/', (req, res) => {
+    res.send('API Running');
+});
 
 // Serve static files from frontend
 app.use(express.static(path.join(__dirname, '../frontend')));
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Request logging middleware
 app.use((req, res, next) => {
@@ -39,22 +44,22 @@ app.use('/api/users', usersRouter);
 app.use('/api/cart', cartRouter);
 app.use('/api/orders', ordersRouter);
 
+// POST /api/payment - Mock payment endpoint
 app.post('/api/payment', (req, res) => {
     const amount = Number(req.body.amount);
 
-    if (!Number.isFinite(amount) || amount <= 0) {
-        return res.status(400).json({
-            success: false,
-            status: 'failed',
-            message: 'Amount must be greater than 0'
+    if (Number.isFinite(amount) && amount > 0) {
+        return res.json({
+            success: true,
+            status: 'success',
+            amount
         });
     }
 
-    res.json({
-        success: true,
-        status: 'success',
-        message: 'Mock payment processed successfully',
-        amount
+    return res.status(400).json({
+        success: false,
+        status: 'failed',
+        message: 'Amount must be greater than 0'
     });
 });
 
@@ -64,17 +69,13 @@ app.get('/api', (req, res) => {
         message: 'TechStore API',
         version: '1.0.0',
         endpoints: {
-            auth: '/api/auth',
             products: '/api/products',
             users: '/api/users',
             cart: '/api/cart',
-            orders: '/api/orders',
-            payment: '/api/payment'
+            orders: '/api/orders'
         }
     });
 });
-
-app.use('/api', notFound);
 
 // Serve frontend for all other routes
 app.get('*', (req, res) => {
